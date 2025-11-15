@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Clicker Game</title>
+    <title>Global Clicker</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            color: white;
+            background-color: #f5f5f5;
+            color: #333;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -24,85 +24,84 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 500px;
             width: 100%;
             text-align: center;
         }
         
         header {
-            margin-bottom: 30px;
+            margin: 30px 0;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         
         h1 {
-            font-size: 3rem;
+            font-size: 2.5rem;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #1a73e8;
+            font-weight: 500;
         }
         
         .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
+            font-size: 1rem;
+            color: #5f6368;
         }
         
         .stats-container {
             display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 20px;
+            justify-content: space-between;
             margin-bottom: 30px;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .stat-box {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            min-width: 200px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #5f6368;
+            margin-bottom: 5px;
         }
         
         .stat-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin: 10px 0;
-            color: #ffcc00;
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: #1a73e8;
         }
         
         .clicker-container {
             margin: 30px 0;
+            position: relative;
         }
         
         .click-button {
-            background: linear-gradient(145deg, #ffcc00, #ff9900);
+            background: #1a73e8;
             border: none;
             border-radius: 50%;
             width: 200px;
             height: 200px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: white;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: all 0.2s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             margin: 0 auto;
+            position: relative;
+            overflow: hidden;
         }
         
         .click-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
-        }
-        
-        .click-button:active {
-            transform: scale(0.95);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: #1669d9;
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
         }
         
         .click-icon {
@@ -110,17 +109,36 @@
             margin-bottom: 10px;
         }
         
+        /* Ripple effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+        
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
         .leaderboard {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
+            background: white;
+            border-radius: 16px;
             padding: 20px;
             margin-top: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .leaderboard h2 {
             margin-bottom: 15px;
-            font-size: 1.8rem;
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #1a73e8;
         }
         
         table {
@@ -131,55 +149,69 @@
         th, td {
             padding: 12px 15px;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e0e0e0;
         }
         
         th {
-            background: rgba(255, 255, 255, 0.1);
+            color: #5f6368;
+            font-weight: 500;
         }
         
-        tr:hover {
-            background: rgba(255, 255, 255, 0.05);
+        tr:last-child td {
+            border-bottom: none;
         }
         
         .rank-1 {
-            color: gold;
-            font-weight: bold;
+            color: #f4b400;
+            font-weight: 500;
         }
         
         .rank-2 {
-            color: silver;
+            color: #5f6368;
         }
         
         .rank-3 {
-            color: #cd7f32; /* bronze */
+            color: #cd7f32;
         }
         
         .footer {
             margin-top: 30px;
             padding: 15px;
+            font-size: 0.8rem;
+            color: #5f6368;
+        }
+        
+        .status {
+            margin-top: 10px;
             font-size: 0.9rem;
-            opacity: 0.7;
+            padding: 8px 12px;
+            border-radius: 20px;
+            display: inline-block;
         }
         
-        .recent-clicks {
-            margin-top: 20px;
-            font-style: italic;
-            opacity: 0.8;
+        .status.connected {
+            background: #e6f4ea;
+            color: #137333;
         }
         
-        @media (max-width: 600px) {
+        .status.disconnected {
+            background: #fce8e6;
+            color: #c5221f;
+        }
+        
+        @media (max-width: 500px) {
             h1 {
-                font-size: 2.2rem;
-            }
-            
-            .stat-box {
-                min-width: 150px;
+                font-size: 2rem;
             }
             
             .click-button {
-                width: 150px;
-                height: 150px;
+                width: 180px;
+                height: 180px;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+                gap: 15px;
             }
         }
     </style>
@@ -187,40 +219,33 @@
 <body>
     <div class="container">
         <header>
-            <h1>Global Clicker Game</h1>
-            <p class="subtitle">Click to increase the global counter in real-time!</p>
+            <h1>Global Clicker</h1>
+            <p class="subtitle">Tap to contribute to the global count</p>
         </header>
         
         <div class="stats-container">
             <div class="stat-box">
                 <div class="stat-label">Global Clicks</div>
                 <div class="stat-value" id="global-clicks">0</div>
-                <div class="stat-desc">Total clicks worldwide</div>
             </div>
             
             <div class="stat-box">
                 <div class="stat-label">Your Clicks</div>
                 <div class="stat-value" id="your-clicks">0</div>
-                <div class="stat-desc">Your contribution</div>
-            </div>
-            
-            <div class="stat-box">
-                <div class="stat-label">Clicks Per Second</div>
-                <div class="stat-value" id="clicks-per-second">0</div>
-                <div class="stat-desc">Global rate</div>
             </div>
         </div>
         
         <div class="clicker-container">
             <button class="click-button" id="click-button">
                 <span class="click-icon">👆</span>
-                CLICK ME!
+                TAP HERE
             </button>
-            <p class="recent-clicks" id="recent-clicks">Recent clicks will appear here</p>
         </div>
         
+        <div id="status" class="status disconnected">Connecting...</div>
+        
         <div class="leaderboard">
-            <h2>Top Clickers</h2>
+            <h2>Top Contributors</h2>
             <table>
                 <thead>
                     <tr>
@@ -231,16 +256,14 @@
                 </thead>
                 <tbody id="leaderboard-body">
                     <tr>
-                        <td>1</td>
-                        <td>Loading...</td>
-                        <td>0</td>
+                        <td colspan="3" style="text-align: center;">Loading...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <div class="footer">
-            <p>No login required • Real-time updates • Global community</p>
+            <p>No login required • Real-time updates</p>
         </div>
     </div>
 
@@ -250,25 +273,42 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkYXdheW5zYWF5amZncnlpYXVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNjg3MzcsImV4cCI6MjA3ODc0NDczN30.jNNAomfpVnwCrsTw-i4lrF3A09oM2VIMz5F6xmYjuUM';
         
         // Initialize Supabase client
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // Game state
         let yourClicks = 0;
         let globalClicks = 0;
-        let clicksPerSecond = 0;
-        let lastClickTime = Date.now();
-        let clickHistory = [];
+        let isConnected = false;
         
         // DOM elements
         const clickButton = document.getElementById('click-button');
         const globalClicksElement = document.getElementById('global-clicks');
         const yourClicksElement = document.getElementById('your-clicks');
-        const clicksPerSecondElement = document.getElementById('clicks-per-second');
-        const recentClicksElement = document.getElementById('recent-clicks');
         const leaderboardBody = document.getElementById('leaderboard-body');
+        const statusElement = document.getElementById('status');
         
         // Generate a unique user ID for this session
-        const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+        const userId = 'user_' + Math.random().toString(36).substring(2, 9);
+        
+        // Ripple effect function
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement("span");
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+            
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+            circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+            circle.classList.add("ripple");
+            
+            const ripple = button.getElementsByClassName("ripple")[0];
+            if (ripple) {
+                ripple.remove();
+            }
+            
+            button.appendChild(circle);
+        }
         
         // Function to update the global click count
         async function updateGlobalClicks() {
@@ -282,53 +322,20 @@
                 
                 if (error) {
                     console.error('Error inserting click:', error);
+                    updateStatus(false);
                     return;
                 }
                 
                 // Update local state
                 yourClicks++;
-                updateDisplay();
+                yourClicksElement.textContent = yourClicks.toLocaleString();
                 
-                // Record this click for recent clicks display
-                const now = new Date();
-                clickHistory.unshift({
-                    time: now.toLocaleTimeString(),
-                    userId: userId
-                });
-                
-                // Keep only the last 5 clicks
-                if (clickHistory.length > 5) {
-                    clickHistory.pop();
-                }
-                
-                updateRecentClicks();
+                updateStatus(true);
                 
             } catch (error) {
                 console.error('Error updating global clicks:', error);
+                updateStatus(false);
             }
-        }
-        
-        // Function to update the display
-        function updateDisplay() {
-            globalClicksElement.textContent = globalClicks.toLocaleString();
-            yourClicksElement.textContent = yourClicks.toLocaleString();
-            clicksPerSecondElement.textContent = clicksPerSecond.toFixed(1);
-        }
-        
-        // Function to update recent clicks display
-        function updateRecentClicks() {
-            if (clickHistory.length === 0) {
-                recentClicksElement.textContent = "No recent clicks yet";
-                return;
-            }
-            
-            let recentText = "Recent clicks: ";
-            clickHistory.forEach((click, index) => {
-                if (index > 0) recentText += " • ";
-                recentText += `${click.time} (${click.userId.substring(0, 6)}...)`;
-            });
-            
-            recentClicksElement.textContent = recentText;
         }
         
         // Function to fetch the global click count
@@ -341,58 +348,64 @@
                 
                 if (error) {
                     console.error('Error fetching global clicks:', error);
+                    updateStatus(false);
                     return;
                 }
                 
                 globalClicks = count;
-                updateDisplay();
+                globalClicksElement.textContent = globalClicks.toLocaleString();
+                
+                updateStatus(true);
                 
             } catch (error) {
                 console.error('Error fetching global clicks:', error);
-            }
-        }
-        
-        // Function to fetch clicks per second
-        async function fetchClicksPerSecond() {
-            try {
-                // Get clicks from the last minute
-                const oneMinuteAgo = new Date(Date.now() - 60000).toISOString();
-                
-                const { count, error } = await supabase
-                    .from('clicks')
-                    .select('*', { count: 'exact', head: true })
-                    .gte('created_at', oneMinuteAgo);
-                
-                if (error) {
-                    console.error('Error fetching clicks per second:', error);
-                    return;
-                }
-                
-                // Calculate clicks per second (average over the last minute)
-                clicksPerSecond = count / 60;
-                updateDisplay();
-                
-            } catch (error) {
-                console.error('Error fetching clicks per second:', error);
+                updateStatus(false);
             }
         }
         
         // Function to fetch leaderboard
         async function fetchLeaderboard() {
             try {
-                const { data, error } = await supabase
+                // First try to use the view
+                let { data, error } = await supabase
                     .from('user_click_counts')
                     .select('*')
                     .order('click_count', { ascending: false })
                     .limit(10);
                 
-                if (error) {
-                    console.error('Error fetching leaderboard:', error);
-                    return;
+                // If the view doesn't exist, use a direct query
+                if (error || !data) {
+                    console.log('View not available, using direct query');
+                    const { data: clickData, error: clickError } = await supabase
+                        .from('clicks')
+                        .select('user_id')
+                        .limit(1000);
+                    
+                    if (clickError) {
+                        console.error('Error fetching clicks for leaderboard:', clickError);
+                        return;
+                    }
+                    
+                    // Manually count clicks per user
+                    const userCounts = {};
+                    clickData.forEach(click => {
+                        userCounts[click.user_id] = (userCounts[click.user_id] || 0) + 1;
+                    });
+                    
+                    // Convert to array and sort
+                    data = Object.entries(userCounts).map(([user_id, click_count]) => ({
+                        user_id,
+                        click_count
+                    })).sort((a, b) => b.click_count - a.click_count).slice(0, 10);
                 }
                 
                 // Update leaderboard
                 leaderboardBody.innerHTML = '';
+                
+                if (data.length === 0) {
+                    leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No clicks yet</td></tr>';
+                    return;
+                }
                 
                 data.forEach((user, index) => {
                     const row = document.createElement('tr');
@@ -403,23 +416,43 @@
                     else if (index === 1) rankClass = 'rank-2';
                     else if (index === 2) rankClass = 'rank-3';
                     
+                    // Shorten user ID for display
+                    const displayUserId = user.user_id.length > 8 
+                        ? user.user_id.substring(0, 8) + '...' 
+                        : user.user_id;
+                    
                     row.innerHTML = `
                         <td class="${rankClass}">${index + 1}</td>
-                        <td class="${rankClass}">${user.user_id}</td>
+                        <td class="${rankClass}">${displayUserId}</td>
                         <td class="${rankClass}">${user.click_count.toLocaleString()}</td>
                     `;
                     
                     leaderboardBody.appendChild(row);
                 });
                 
+                updateStatus(true);
+                
             } catch (error) {
                 console.error('Error fetching leaderboard:', error);
+                updateStatus(false);
+            }
+        }
+        
+        // Update connection status
+        function updateStatus(connected) {
+            isConnected = connected;
+            if (connected) {
+                statusElement.textContent = 'Connected';
+                statusElement.className = 'status connected';
+            } else {
+                statusElement.textContent = 'Disconnected - Check Supabase configuration';
+                statusElement.className = 'status disconnected';
             }
         }
         
         // Set up real-time subscription for clicks
         function setupRealtimeSubscription() {
-            supabase
+            const subscription = supabase
                 .channel('global-clicks')
                 .on('postgres_changes', 
                     { 
@@ -430,21 +463,7 @@
                     (payload) => {
                         // Update global click count when a new click is added
                         globalClicks++;
-                        updateDisplay();
-                        
-                        // Add to recent clicks
-                        const now = new Date();
-                        clickHistory.unshift({
-                            time: now.toLocaleTimeString(),
-                            userId: payload.new.user_id
-                        });
-                        
-                        // Keep only the last 5 clicks
-                        if (clickHistory.length > 5) {
-                            clickHistory.pop();
-                        }
-                        
-                        updateRecentClicks();
+                        globalClicksElement.textContent = globalClicks.toLocaleString();
                         
                         // Update leaderboard periodically
                         if (globalClicks % 10 === 0) {
@@ -452,21 +471,26 @@
                         }
                     }
                 )
-                .subscribe();
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        updateStatus(true);
+                    } else if (status === 'CHANNEL_ERROR') {
+                        updateStatus(false);
+                    }
+                });
         }
         
         // Initialize the game
         async function initGame() {
+            // Add ripple effect to button
+            clickButton.addEventListener('click', createRipple);
+            
             // Fetch initial data
             await fetchGlobalClicks();
-            await fetchClicksPerSecond();
             await fetchLeaderboard();
             
             // Set up real-time subscription
             setupRealtimeSubscription();
-            
-            // Update clicks per second periodically
-            setInterval(fetchClicksPerSecond, 10000);
             
             // Update leaderboard periodically
             setInterval(fetchLeaderboard, 30000);
